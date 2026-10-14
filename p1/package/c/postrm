@@ -1,0 +1,10 @@
+#! /bin/sh
+# Inlog voor /mobile weer uitzetten als die door dit pakket is toegevoegd
+LCONF=/HCBv2/etc/lighttpd/lighttpd.conf
+LBAK=/HCBv2/etc/lighttpd/lighttpd.conf.tsctoonmobilep1_backup
+if [ -f "$LBAK" ] && grep -q 'tsctoonmobilep1-auth' "$LCONF" 2>/dev/null ; then
+	cp "$LBAK" "$LCONF"
+	rm -f "$LBAK"
+	killall lighttpd 2>/dev/null
+fi
+exit 0

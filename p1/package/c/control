@@ -1,0 +1,12 @@
+Package: tsctoonmobilep1
+Version: 2.0.0-r0
+Description: Toon 2.0.0 - mobiele web-interface (Toon-stijl) rechtstreeks op de Toon, zonder Home Assistant
+Section: toon/apps
+Priority: optional
+Maintainer: OpenEmbedded Team <openembedded-devel@lists.openembedded.org>
+License: GPLV2
+Architecture: all
+Conflicts: tsctoonmobile
+OE: tsctoonmobilep1
+Homepage: https://www.domoticaforum.eu/
+Source: file://1.2.0/tsctoonmobilep1-1.2.0.zip

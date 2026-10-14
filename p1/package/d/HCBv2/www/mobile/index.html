@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#ffffff"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<title>Toon</title>
+<link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials"/>
+<link rel="icon" type="image/png" href="icon-192.png"/>
+<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+<script>(function(){try{var c=JSON.parse((window.Android&&Android.getPref?Android.getPref("cfg"):localStorage.getItem("cfg"))||"{}"),t=c.theme||"auto",d=t==="dark"||(t==="auto"&&((window.Android&&Android.isSystemDark)?Android.isSystemDark():(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)));document.documentElement.setAttribute("data-theme",d?"dark":"light");}catch(e){}})();</script>
+<link rel="stylesheet" href="app.css?v=2.0.0"/>
+</head>
+<body>
+
+<div id="app">
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="brand">Toon</div>
+    <button class="icon-btn refresh-btn" id="refresh-btn" title="Vernieuwen" aria-label="Vernieuwen">⟳</button>
+    <div class="status" id="ha-status">
+      <span class="dot-label">Toon</span><span class="dot" id="toon-dot"></span>
+      <span class="dot-label">P1</span><span class="dot" id="p1-dot"></span>
+    </div>
+  </header>
+
+  <!-- Tab content -->
+  <main id="views">
+
+    <!-- ============ DASHBOARD ============ -->
+    <section class="view active" id="view-dash">
+
+      <div class="thermo" id="thermo-card">
+        <div class="th-row">
+          <button class="rbtn" id="temp-minus" aria-label="Koeler">&minus;</button>
+          <div class="th-cur"><div class="thermo-current" id="thermo-current">–,–°</div></div>
+          <div class="thermo-flame" id="thermo-flame"></div>
+          <div class="th-set"><small>op</small><div class="thermo-set" id="th-set-wrap"><span id="thermo-set">–,–°</span></div></div>
+          <button class="rbtn" id="temp-plus" aria-label="Warmer">+</button>
+        </div>
+        <div class="thermo-modes" id="thermo-modes">
+          <button class="mode-btn" data-state="3"><span class="pc"></span><span class="mode-title">Weg</span><span class="mode-temp" id="mode-3">–°</span></button>
+          <button class="mode-btn" data-state="1"><span class="pc"></span><span class="mode-title">Thuis</span><span class="mode-temp" id="mode-1">–°</span></button>
+          <button class="mode-btn" data-state="2"><span class="pc"></span><span class="mode-title">Slapen</span><span class="mode-temp" id="mode-2">–°</span></button>
+          <button class="mode-btn" data-state="0"><span class="pc"></span><span class="mode-title">Comfort</span><span class="mode-temp" id="mode-0">–°</span></button>
+        </div>
+        <div class="prog-row" id="prog-row">
+          <div class="prog-txt"><span id="prog-main">Programma aan</span> <b id="prog-next"></b></div>
+          <button class="switch" id="prog-toggle" aria-label="Programma aan/uit"><span class="knob"></span></button>
+        </div>
+        <div class="hol-banner" id="hol-banner"><span id="hol-banner-txt"></span><button id="hol-banner-off">Zet uit</button></div>
+        <div class="thermo-info" id="thermo-info">–</div>
+      </div>
+
+      <div class="tiles">
+        <div class="tile-w"><div class="tile" role="button" tabindex="0" data-go="hours:consumption">
+          <div class="tile-name">Stroom nu</div>
+          <div class="tile-visual"><div class="pbar" id="stripes-power"></div></div>
+          <div class="tile-value"><span id="val-power">–</span><span class="unit">Watt</span></div>
+        </div></div>
+        <div class="tile-w gas-only"><div class="tile" role="button" tabindex="0" data-go="days:consumption:gas">
+          <div class="tile-name">Gas vandaag</div>
+          <div class="tile-visual"><div class="squares gas"><div class="sq top"><i id="sq-gas-top"></i></div><div class="sq bottom"><i id="sq-gas-bottom"></i></div></div></div>
+          <div class="tile-value"><span id="val-day-gas">–</span><span class="unit">m³</span></div><div class="tile-note" id="note-day-gas"></div>
+        </div></div>
+        <div class="tile-w"><div class="tile" role="button" tabindex="0" data-go="days:consumption">
+          <div class="tile-name">Stroom vandaag</div>
+          <div class="tile-visual"><div class="squares"><div class="sq top"><i id="sq-cons-top"></i></div><div class="sq bottom"><i id="sq-cons-bottom"></i></div></div></div>
+          <div class="tile-value"><span id="val-day-cons">–</span><span class="unit">kWh</span></div><div class="tile-note" id="note-day-cons"></div>
+        </div></div>
+        <div class="tile-w solar-only"><div class="tile" role="button" tabindex="0" data-go="hours:production">
+          <div class="tile-name">Productie nu</div>
+          <div class="tile-visual"><svg class="icon-panel" viewBox="0 -3 120 84"><g fill="none" fill-rule="evenodd"><g class="ic-panel"><path d="M54 18H42a2.997 2.997 0 0 0-2.91 2.274l-2.25 8.997A2.999 2.999 0 0 0 39.75 33H54c1.656 0 3-1.344 3-3v-9c0-1.656-1.344-3-3-3M66 33h14.25a2.999 2.999 0 0 0 2.91-3.729l-2.25-9A2.998 2.998 0 0 0 78 18H66c-1.656 0-3 1.344-3 3v9c0 1.656 1.344 3 3 3M89.91 56.272l-3.75-15A2.998 2.998 0 0 0 83.25 39H66a3 3 0 0 0-3 3v15c0 1.656 1.345 3 3 3h21a3 3 0 0 0 2.91-3.73M54 39H36.75a2.998 2.998 0 0 0-2.91 2.271l-3.75 15a2.99 2.99 0 0 0 .546 2.574A2.995 2.995 0 0 0 33 60h21c1.656 0 3-1.344 3-3V42c0-1.656-1.344-3-3-3"/></g><g class="dots" id="solar-dots" style="fill:#ff9900;display:none"><path fill-opacity=".4" d="M10 5A5 5 0 1 1 0 5a5 5 0 0 1 10 0"/><path fill-opacity=".7" d="M27 12.5a7.501 7.501 0 0 1-15 0 7.501 7.501 0 0 1 15 0"/><path d="M49 22c0 5.522-4.478 10-10 10s-10-4.478-10-10 4.478-10 10-10 10 4.478 10 10"/></g></g></svg></div>
+          <div class="tile-value"><span id="val-solar">–</span><span class="unit">Watt</span></div>
+        </div></div>
+        <div class="tile-w solar-only"><div class="tile" role="button" tabindex="0" data-go="hours:production,consumption">
+          <div class="tile-name">Verbruik uit zonne-energie</div>
+          <div class="tile-visual"><svg viewBox="0 0 120 76"><defs><path id="hs-a" d="M85.7 29.029l-24-16.5a2.998 2.998 0 0 0-3.4 0l-24 16.5a3 3 0 0 0-.771 4.171 2.988 2.988 0 0 0 3.972.882v24.419c0 .828.67 1.5 1.5 1.5h42a1.5 1.5 0 0 0 1.5-1.5V34.069c.47.274.98.432 1.497.432a3 3 0 0 0 1.703-5.472"/></defs><g fill="none" fill-rule="evenodd" transform="translate(0 8)"><g class="dots" id="self-dots" style="fill:#ff9900;display:none"><path opacity=".7" d="M16 4.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0"/><path d="M37 15c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9"/></g><mask id="hs-b"><use href="#hs-a" fill="#fff"/></mask><path fill="#8e24aa" d="M85.7 29.029l-24-16.5a2.998 2.998 0 0 0-3.4 0l-24 16.5a3 3 0 0 0-.771 4.171 2.988 2.988 0 0 0 3.972.882v24.419c0 .828.67 1.5 1.5 1.5h42a1.5 1.5 0 0 0 1.5-1.5V34.069c.47.274.98.432 1.497.432a3 3 0 0 0 1.703-5.472"/><rect id="house-fill" x="33" y="12" width="0" height="48" mask="url(#hs-b)" fill="#ff9900"/></g></svg></div>
+          <div class="tile-value"><span id="val-self">–</span></div>
+        </div></div>
+        <div class="tile-w solar-only"><div class="tile" role="button" tabindex="0" data-go="hours:production,consumption">
+          <div class="tile-name"><span id="title-grid">Afname van net</span></div>
+          <div class="tile-visual"><svg viewBox="0 0 120 76"><g fill-rule="evenodd" transform="translate(-21 8)"><path fill="#565656" d="M67.808 9L81.5 3.132 95.192 9H67.808zM86 22.797l-3.909-1.675a1.498 1.498 0 0 0-1.182 0L77 22.797V12h9v10.797zM87.48 30H67.809L81.5 24.132 95.192 30h-7.711zm1.407 8.315L81.5 43.65l-7.388-5.335L76.475 33h10.05l2.362 5.315zm-4.825 7.184l6.07-4.384 5.74 12.915-11.81-8.53zM67.129 54.03l5.739-12.915 6.07 4.384-11.81 8.531zM102.5 18a1.5 1.5 0 0 0 1.5-1.5v-6c0-.033-.016-.062-.02-.095a1.443 1.443 0 0 0-.07-.35c-.02-.063-.033-.128-.06-.187a1.518 1.518 0 0 0-.215-.318c-.034-.04-.056-.087-.094-.124a1.49 1.49 0 0 0-.45-.305l-.004-.001-.005-.003L82.091.121a1.498 1.498 0 0 0-1.182 0L59.918 9.117l-.005.003-.004.002a1.49 1.49 0 0 0-.45.304c-.038.037-.06.084-.095.124a1.462 1.462 0 0 0-.214.318c-.029.059-.04.123-.06.187a1.443 1.443 0 0 0-.07.35c-.004.034-.02.062-.02.095v6a1.5 1.5 0 0 0 3 0V12h12v12.082l-14.082 6.035-.005.003-.004.002a1.49 1.49 0 0 0-.45.304c-.038.038-.06.084-.095.125a1.462 1.462 0 0 0-.214.318c-.029.058-.04.122-.06.186a1.443 1.443 0 0 0-.07.35c-.004.034-.02.062-.02.095v6a1.5 1.5 0 0 0 3 0V33h11.192L62.129 57.891a1.5 1.5 0 0 0 2.248 1.826L81.5 47.35l17.121 12.367c.264.189.572.283.879.283a1.5 1.5 0 0 0 1.371-2.109L89.808 33H101v4.5a1.5 1.5 0 0 0 3 0v-6c0-.033-.016-.061-.02-.095a1.443 1.443 0 0 0-.07-.35c-.02-.064-.033-.128-.06-.186a1.518 1.518 0 0 0-.215-.319c-.034-.04-.056-.087-.094-.124a1.49 1.49 0 0 0-.45-.304l-.004-.002-.005-.003L89 24.082V12h12v4.5a1.5 1.5 0 0 0 1.5 1.5z"/><g class="dots" id="grid-dots" fill="#8e24aa"><circle cx="50" cy="30" r="2"/><circle cx="38" cy="30" r="4"/><circle cx="26" cy="30" r="6"/></g></g></svg></div>
+          <div class="tile-value"><span id="val-grid">–</span><span class="unit">Watt</span></div>
+        </div></div>
+        <div class="tile-w solar-only"><div class="tile" role="button" tabindex="0" data-go="days:production">
+          <div class="tile-name">Productie vandaag</div>
+          <div class="tile-visual"><svg viewBox="0 0 64 64"><g fill="none" fill-rule="evenodd"><path class="ic-sun" d="M51.2 32c0 10.602-8.598 19.2-19.2 19.2-10.602 0-19.2-8.598-19.2-19.2 0-10.602 8.598-19.2 19.2-19.2 10.602 0 19.2 8.598 19.2 19.2zm9.6-3.2h-3.2a3.201 3.201 0 0 0 0 6.4h3.2a3.201 3.201 0 0 0 0-6.4zM32 54.4a3.201 3.201 0 0 0-3.2 3.2v3.2a3.201 3.201 0 0 0 6.4 0v-3.2c0-1.766-1.434-3.2-3.2-3.2zm20.365-6.56a3.196 3.196 0 0 0-4.525 0 3.196 3.196 0 0 0 0 4.525l2.262 2.262a3.202 3.202 0 0 0 4.525 0 3.202 3.202 0 0 0 0-4.525l-2.262-2.262zM9.6 32c0-1.766-1.434-3.2-3.2-3.2H3.2a3.201 3.201 0 0 0 0 6.4h3.2c1.766 0 3.2-1.434 3.2-3.2zM32 9.6c1.766 0 3.2-1.434 3.2-3.2V3.2a3.201 3.201 0 0 0-6.4 0v3.2c0 1.766 1.434 3.2 3.2 3.2zm20.365 6.56l2.262-2.262a3.202 3.202 0 0 0 0-4.525 3.202 3.202 0 0 0-4.525 0l-2.262 2.262a3.196 3.196 0 0 0 0 4.525 3.196 3.196 0 0 0 4.525 0zm-40.73 31.68l-2.262 2.262a3.202 3.202 0 0 0 0 4.525 3.202 3.202 0 0 0 4.525 0l2.262-2.262a3.196 3.196 0 0 0 0-4.525 3.196 3.196 0 0 0-4.525 0zM9.373 13.898a3.202 3.202 0 0 1 0-4.525 3.202 3.202 0 0 1 4.525 0l2.262 2.262a3.196 3.196 0 0 1 0 4.525 3.196 3.196 0 0 1-4.525 0l-2.262-2.262z"/><path fill="#FFF" d="M39.81 31.245a1.596 1.596 0 0 0-1.41-.844h-4.8v-8a1.6 1.6 0 1 0-2.931-.89l-6.4 9.6a1.606 1.606 0 0 0-.08 1.645c.278.518.822.845 1.41.845h4.8v8a1.599 1.599 0 0 0 1.6 1.6c.525 0 1.031-.26 1.332-.714l6.4-9.6a1.6 1.6 0 0 0 .08-1.642"/></g></svg></div>
+          <div class="tile-value"><span id="val-day-solar">–</span><span class="unit">kWh</span></div><div class="tile-note" id="note-day-solar"></div>
+        </div></div>
+      </div>
+
+    </section>
+
+    <!-- ============ AAN · UIT (slimme stekkers van de Toon) ============ -->
+    <section class="view" id="view-plugs">
+      <div class="menu-list" id="plug-list"><div class="empty">Stekkers laden…</div></div>
+    </section>
+
+    <!-- ============ INZICHTEN ============ -->
+    <section class="view" id="view-insights">
+      <div class="menu-list">
+        <button class="mi" data-open="graph">
+          <img class="mi-ico" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgdmlld0JveD0iMCAwIDMwIDMwIj4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZmlsbD0iIzM3RiIgZD0iTTEwLjUgNmgtM0ExLjUgMS41IDAgMCAwIDYgNy41djE1QTEuNSAxLjUgMCAwIDAgNy41IDI0aDNhMS41IDEuNSAwIDAgMCAxLjUtMS41di0xNUExLjUgMS41IDAgMCAwIDEwLjUgNk0xOS41IDBoLTNBMS41IDEuNSAwIDAgMCAxNSAxLjV2MjFhMS41IDEuNSAwIDAgMCAxLjUgMS41aDNhMS41IDEuNSAwIDAgMCAxLjUtMS41di0yMUExLjUgMS41IDAgMCAwIDE5LjUgME0yOC41IDEyaC0zYTEuNSAxLjUgMCAwIDAtMS41IDEuNXY5YTEuNSAxLjUgMCAwIDAgMS41IDEuNWgzYTEuNSAxLjUgMCAwIDAgMS41LTEuNXYtOWExLjUgMS41IDAgMCAwLTEuNS0xLjUiLz4KICAgICAgICA8cGF0aCBmaWxsPSIjNTY1NjU2IiBkPSJNMjguNSAyN0gzVjEuNWExLjUgMS41IDAgMCAwLTMgMHYyN0ExLjUgMS41IDAgMCAwIDEuNSAzMGgyN2ExLjUgMS41IDAgMCAwIDAtMyIvPgogICAgPC9nPgo8L3N2Zz4K" alt=""/>
+          <span class="mi-txt"><span class="mi-title">Grafieken</span><span class="mi-sub">Verbruik en opwek per uur, dag, maand en jaar</span></span><svg class="mi-chev" viewBox="0 0 20 20"><path fill="#a8a8a8" d="M15.75 10c0-.384-.146-.768-.439-1.061l-8.5-8.5a1.502 1.502 0 0 0-2.122 0 1.502 1.502 0 0 0 0 2.122L12.129 10l-7.44 7.439a1.502 1.502 0 0 0 0 2.122 1.502 1.502 0 0 0 2.122 0l8.5-8.5A1.495 1.495 0 0 0 15.75 10"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ============ STATUS ============ -->
+    <section class="view" id="view-status">
+      <div class="menu-list" id="status-list"></div>
+      <button class="primary-btn" id="diag-btn">Gegevenscontrole</button>
+      <pre class="diag" id="diag-out"></pre>
+      <button class="primary-btn ghost" id="diag-copy" style="display:none">Tekst kopiëren</button>
+    </section>
+
+    <!-- ============ MEER ============ -->
+    <section class="view" id="view-more">
+      <div class="menu-list">
+        <button class="mi" data-open="program">
+          <span class="mi-ico mi-glyph"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></span>
+          <span class="mi-txt"><span class="mi-title">Programma</span><span class="mi-sub">Instellen, opslaan en nooit meer zorgen over maken.</span></span><svg class="mi-chev" viewBox="0 0 20 20"><path fill="#a8a8a8" d="M15.75 10c0-.384-.146-.768-.439-1.061l-8.5-8.5a1.502 1.502 0 0 0-2.122 0 1.502 1.502 0 0 0 0 2.122L12.129 10l-7.44 7.439a1.502 1.502 0 0 0 0 2.122 1.502 1.502 0 0 0 2.122 0l8.5-8.5A1.495 1.495 0 0 0 15.75 10"/></svg>
+        </button>
+        <button class="mi" data-open="holiday">
+          <span class="mi-ico mi-glyph"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V10l7-6 7 6v10M10 20v-5h4v5"/></svg></span>
+          <span class="mi-txt"><span class="mi-title">Vakantie</span><span class="mi-sub">Vakantiestand aan of uit zetten</span></span><svg class="mi-chev" viewBox="0 0 20 20"><path fill="#a8a8a8" d="M15.75 10c0-.384-.146-.768-.439-1.061l-8.5-8.5a1.502 1.502 0 0 0-2.122 0 1.502 1.502 0 0 0 0 2.122L12.129 10l-7.44 7.439a1.502 1.502 0 0 0 0 2.122 1.502 1.502 0 0 0 2.122 0l8.5-8.5A1.495 1.495 0 0 0 15.75 10"/></svg>
+        </button>
+        <button class="mi" data-open="settings">
+          <span class="mi-ico mi-glyph"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></span>
+          <span class="mi-txt"><span class="mi-title">Instellingen</span><span class="mi-sub">Toon, sensoren, balken en tarieven</span></span><svg class="mi-chev" viewBox="0 0 20 20"><path fill="#a8a8a8" d="M15.75 10c0-.384-.146-.768-.439-1.061l-8.5-8.5a1.502 1.502 0 0 0-2.122 0 1.502 1.502 0 0 0 0 2.122L12.129 10l-7.44 7.439a1.502 1.502 0 0 0 0 2.122 1.502 1.502 0 0 0 2.122 0l8.5-8.5A1.495 1.495 0 0 0 15.75 10"/></svg>
+        </button>
+        <button class="mi" data-open="about">
+          <span class="mi-ico mi-glyph"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.500v.5"/></svg></span>
+          <span class="mi-txt"><span class="mi-title">Over deze app</span><span class="mi-sub">Versie en gegevensbronnen</span></span><svg class="mi-chev" viewBox="0 0 20 20"><path fill="#a8a8a8" d="M15.75 10c0-.384-.146-.768-.439-1.061l-8.5-8.5a1.502 1.502 0 0 0-2.122 0 1.502 1.502 0 0 0 0 2.122L12.129 10l-7.44 7.439a1.502 1.502 0 0 0 0 2.122 1.502 1.502 0 0 0 2.122 0l8.5-8.5A1.495 1.495 0 0 0 15.75 10"/></svg>
+        </button>
+      </div>
+    </section>
+
+
+    <!-- ============ SETTINGS ============ -->
+    
+
+  </main>
+
+
+  <!-- Bottom navigation -->
+  <nav class="tabbar">
+    <button class="tab active" data-view="dash">
+      <span class="tab-ico"><svg viewBox="-1 -1 24 24"><path d="M20.114 7.21l-9-7c-.36-.28-.867-.28-1.228 0l-9 7a1 1 0 0 0 1.228 1.579l.386-.3V19a1 1 0 0 0 1 1h5v-7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h5a1 1 0 0 0 1-1V8.489l.386.3a.998.998 0 0 0 1.404-.176 1 1 0 0 0-.176-1.403"/></svg></span><span class="tab-label">Home</span>
+    </button>
+    <button class="tab" data-view="insights">
+      <span class="tab-ico"><svg viewBox="0 0 24 24"><path d="M8.499 21.088c-.596 0-1.141-.355-1.378-.913l-2.61-6.116H3.5c-.828 0-1.5-.674-1.5-1.506 0-.833.672-1.507 1.5-1.507h2c.6 0 1.143.359 1.379.913l1.29 3.024L11.051 4.13c.169-.636.728-1.088 1.383-1.117.669-.03 1.252.373 1.476.99l3.194 8.824 1.335-1.34c.282-.283.664-.442 1.061-.442h1c.828 0 1.5.674 1.5 1.507 0 .832-.672 1.506-1.5 1.506h-.379l-2.56 2.572c-.363.363-.884.513-1.386.405-.5-.111-.909-.473-1.085-.956l-2.369-6.545L9.949 19.97c-.165.621-.703 1.068-1.341 1.114-.037.003-.073.004-.109.004"/></svg></span><span class="tab-label">Inzichten</span>
+    </button>
+    <button class="tab" data-view="plugs">
+      <span class="tab-ico"><svg viewBox="-2 -2 24 24"><path d="M5.553 11a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm11 1a3 3 0 1 1 0 6h-5.81a5.961 5.961 0 0 0 0-6zm-1-11a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm-5.19 1a5.961 5.961 0 0 0 0 6h-5.81a3 3 0 1 1 0-6z"/></svg></span><span class="tab-label">Aan · Uit</span>
+    </button>
+    <button class="tab" data-view="status">
+      <span class="tab-ico"><svg viewBox="0 0 24 24"><path d="M12 3.5a8.500 8.500 0 1 0 0 17 8.500 8.500 0 0 0 0-17zm-1 4.500h2v5h-2zm0 7h2v2h-2z"/></svg></span><span class="tab-label">Status</span>
+    </button>
+    <button class="tab" data-view="more">
+      <span class="tab-ico"><svg viewBox="-2 -2 24 24"><path d="M2.522 7a3.022 3.022 0 1 1 0 6.044 3.022 3.022 0 0 1 0-6.044zm15.957 0a3.022 3.022 0 1 1-.002 6.044A3.022 3.022 0 0 1 18.48 7zm-7.978 0a3.022 3.022 0 1 1-.002 6.044A3.022 3.022 0 0 1 10.5 7z"/></svg></span><span class="tab-label">Meer</span>
+    </button>
+  </nav>
+</div>
+
+
+<!-- ============ OVERLAY-PAGINA'S (oranje kop met terugknop, zoals de Toon-app) ============ -->
+<div class="page" id="page-graph">
+  <div class="page-head"><button class="back-btn" id="graph-back" aria-label="Terug"><svg viewBox="0 0 20 20"><path fill="#FFF" fill-rule="evenodd" d="M4.25 10c0 .384.146.768.439 1.061l8.5 8.5a1.502 1.502 0 0 0 2.122 0 1.502 1.502 0 0 0 0-2.122L7.871 10l7.44-7.439a1.502 1.502 0 0 0 0-2.122 1.502 1.502 0 0 0-2.122 0l-8.5 8.5A1.495 1.495 0 0 0 4.25 10"/></svg></button><div class="page-title">Grafieken</div></div>
+  <div class="page-body g-body">
+    <button class="g-title" id="g-title" type="button" aria-label="Kies Stroom of Gas">
+      <svg viewBox="0 0 24 24" class="g-title-ico" id="g-title-ico"><path fill="#8E24AA" d="M13.2 2 5 13.500h5.300L9.300 22 18 10h-5.200z"/></svg>
+      <h2 id="g-title-text">Stroom</h2>
+      <svg viewBox="0 0 24 24" class="g-title-arrow" id="g-title-arrow"><path d="M5 9l7 7 7-7" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="tbg g-periods" id="g-periods">
+      <button data-p="hours">U</button><button data-p="days" class="sel">D</button><button data-p="months">M</button><button data-p="years">J</button>
+    </div>
+    <div class="c-chart" id="g-chart">
+      <svg class="c-yaxis" id="g-yaxis"></svg>
+      <div class="c-scroll" id="g-scroll"></div>
+      <div class="c-fade"></div>
+      <div class="c-spin" id="g-spin"><div class="spinner"></div></div>
+      <div class="c-nodata" id="g-nodata"><div class="c-msg" id="g-msg"></div><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMjQ3IiBoZWlnaHQ9Ijg2IiB2aWV3Qm94PSIwIDAgMjQ3IDg2Ij4KICAgIDxkZWZzPgogICAgICAgIDxwYXRoIGlkPSJtNm0wMzIzd3dhIiBkPSJNMCAwLjAwMUw2IDAuMDAxIDYgNiAwIDZ6Ii8+CiAgICAgICAgPHBhdGggaWQ9InRheTJtc3lxbmMiIGQ9Ik0wIDAuMDAxTDYgMC4wMDEgNiA2IDAgNnoiLz4KICAgIDwvZGVmcz4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGc+CiAgICAgICAgICAgIDxnPgogICAgICAgICAgICAgICAgPGc+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZmlsbD0iIzU2NTY1NiIgZD0iTTUwIDQ0LjAwMmwtMTYtMzYtMzQtOHY4YzAgMi4yMDkgMS43OTEgNCA0IDRoNHY4YzAgMi4yMDkgMS43OTEgNCA0IDRoNHY4YzAgMi4yMDkgMS43OTEgNCA0IDRoNHY0YzAgMi4yMDkgMS43OTEgNCA0IDRoMjJ6IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNjQgLTMwMikgbWF0cml4KC0xIDAgMCAxIDMxMSAzMDIpIHRyYW5zbGF0ZSg5OCkiLz4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBmaWxsPSIjQThBOEE4IiBkPSJNNTQgODYuMDAyaC01LjIyNWMtMS4zNjUgMC0yLjMyOS0xLjMzOC0xLjg5OC0yLjYzM0w1MCA3NC4wMDJzLTIwLTEwLTIwLTI4YzAtOS4wMTggMy4wMTEtMTkuNTQxIDYuMDE3LTI3Ljc5OUw1NCAyMC4wMDJ2NjZ6IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNjQgLTMwMikgbWF0cml4KC0xIDAgMCAxIDMxMSAzMDIpIHRyYW5zbGF0ZSg5OCkiLz4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBmaWxsPSIjMDA5N0E3IiBkPSJNNTQgNmMwLTMuMzEzLTIuNjg3LTYtNi02LTQgMC02IDQuMDAyLTYgNC4wMDJzLTIuMDg0IDQuMTY4LTQuNTE0IDEwLjMzTDU0IDE4LjAwMlY2eiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTY0IC0zMDIpIG1hdHJpeCgtMSAwIDAgMSAzMTEgMzAyKSB0cmFuc2xhdGUoOTgpIi8+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZmlsbD0iI0ZGRiIgZD0iTTU0IDIwLjAwMmwtMTcuOTgzLTEuNzk5Yy40OTUtMS4zNTcuOTg5LTIuNjUyIDEuNDctMy44N0w1NCAxOC4wMDF2MnoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02NCAtMzAyKSBtYXRyaXgoLTEgMCAwIDEgMzExIDMwMikgdHJhbnNsYXRlKDk4KSIvPgogICAgICAgICAgICAgICAgICAgIDxwYXRoIGZpbGw9IiMwMDAiIGQ9Ik00NyA0Yy0uNTUyIDAtMSAuNDQ4LTEgMXMuNDQ4IDEgMSAxIDEtLjQ0OCAxLTEtLjQ0OC0xLTEtMSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTY0IC0zMDIpIG1hdHJpeCgtMSAwIDAgMSAzMTEgMzAyKSB0cmFuc2xhdGUoOTgpIi8+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZmlsbD0iIzU2NTY1NiIgZD0iTTU0IDI2cy0xMiAwLTEyIDEyIDEyIDM2IDEyIDM2VjI2eiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTY0IC0zMDIpIG1hdHJpeCgtMSAwIDAgMSAzMTEgMzAyKSB0cmFuc2xhdGUoOTgpIi8+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZmlsbD0iI0U2NEYwQSIgZD0iTTQyIDQuMDAyTDM1LjMgNS4zNGMtLjk3NS4xOTUtMS4wOTkgMS41NC0uMTc1IDEuOTFMNDIgMTBjMS4xMDUgMCAyLS44OTYgMi0ybC0yLTMuOTk4ek00MiA2OC4wMDJjLTEuMTA1IDAtMi0uODk2LTItMnYtNGMwLTEuMTA1Ljg5NS0yIDItMnMyIC44OTUgMiAydjRjMCAxLjEwNC0uODk1IDItMiAyTTM2IDY4LjAwMmMtMS4xMDUgMC0yLS44OTYtMi0ydi00YzAtMS4xMDUuODk1LTIgMi0yczIgLjg5NSAyIDJ2NGMwIDEuMTA0LS44OTUgMi0yIDIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02NCAtMzAyKSBtYXRyaXgoLTEgMCAwIDEgMzExIDMwMikgdHJhbnNsYXRlKDk4KSIvPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgICAgPGc+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZmlsbD0iI0E4QThBOCIgZD0iTTI0IDg2LjAwMmgtNS4yMjVjLTEuMzY1IDAtMi4zMjktMS4zMzgtMS44OTctMi42MzNMMjAgNzQuMDAycy0yMC0xMC0yMC0yOGMwLTkuMDE4IDMuMDExLTE5LjU0MSA2LjAxOC0yNy43OTlMMjQgMjAuMDAydjY2eiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTY0IC0zMDIpIG1hdHJpeCgtMSAwIDAgMSAzMTEgMzAyKSB0cmFuc2xhdGUoMjE1KSIvPgogICAgICAgICAgICAgICAgICAgIDxwYXRoIGZpbGw9IiMwMDk3QTciIGQ9Ik0yNCA2YzAtMy4zMTMtMi42ODYtNi02LTYtNCAwLTYgNC4wMDItNiA0LjAwMlM5LjkxNiA4LjE3IDcuNDg3IDE0LjMzMkwyNCAxOC4wMDJWNnoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02NCAtMzAyKSBtYXRyaXgoLTEgMCAwIDEgMzExIDMwMikgdHJhbnNsYXRlKDIxNSkiLz4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBmaWxsPSIjRkZGIiBkPSJNMjQgMjAuMDAyTDYuMDE3IDE4LjIwM2MuNDk1LTEuMzU3Ljk4OS0yLjY1MiAxLjQ3LTMuODdMMjQgMTguMDAxdjJ6IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNjQgLTMwMikgbWF0cml4KC0xIDAgMCAxIDMxMSAzMDIpIHRyYW5zbGF0ZSgyMTUpIi8+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZmlsbD0iIzAwMCIgZD0iTTE5IDRjLS41NTIgMC0xIC40NDgtMSAxcy40NDggMSAxIDEgMS0uNDQ4IDEtMS0uNDQ4LTEtMS0xIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNjQgLTMwMikgbWF0cml4KC0xIDAgMCAxIDMxMSAzMDIpIHRyYW5zbGF0ZSgyMTUpIi8+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZmlsbD0iIzU2NTY1NiIgZD0iTTI0IDI2cy0xMiAwLTEyIDEyIDEyIDM2IDEyIDM2VjI2eiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTY0IC0zMDIpIG1hdHJpeCgtMSAwIDAgMSAzMTEgMzAyKSB0cmFuc2xhdGUoMjE1KSIvPgogICAgICAgICAgICAgICAgICAgIDxwYXRoIGZpbGw9IiNFNjRGMEEiIGQ9Ik0yNCA2LjAwNGw2LjcgMS4zMzhjLjk3Ni4xOTUgMS4wOTkgMS41NC4xNzUgMS45MUwyNCAxMi4wMDJjLTEuMTA1IDAtMi0uODk2LTItMmwyLTMuOTk4ek0xMiA2OC4wMDJjLTEuMTA0IDAtMi0uODk2LTItMnYtNGMwLTEuMTA1Ljg5Ni0yIDItMnMyIC44OTUgMiAydjRjMCAxLjEwNC0uODk2IDItMiAyTTYgNjguMDAyYy0xLjEwNCAwLTItLjg5Ni0yLTJ2LTRjMC0xLjEwNS44OTYtMiAyLTJzMiAuODk1IDIgMnY0YzAgMS4xMDQtLjg5NiAyLTIgMiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTY0IC0zMDIpIG1hdHJpeCgtMSAwIDAgMSAzMTEgMzAyKSB0cmFuc2xhdGUoMjE1KSIvPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgICAgPGc+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZmlsbD0iIzAwOTdBNyIgZD0iTTIxLjcxIDUuNzAxYy0xLjAxNS0zLjM4NC00LjEzLTUuNy03LjY2Mi01LjdIMTRDOS41ODIgMCA2IDMuNTggNiA4aC4wMDJsNCA0YzAgMS4xMDQtLjg5NiAyLTIgMkg2djZsMTguMzQ4LTUuNTA2LTIuNjM4LTguNzk0eiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTY0IC0zMDIpIG1hdHJpeCgtMSAwIDAgMSAzMTEgMzAyKSBtYXRyaXgoLTEgMCAwIDEgNDMuNSAwKSIvPgogICAgICAgICAgICAgICAgICAgIDxwYXRoIGZpbGw9IiNBOEE4QTgiIGQ9Ik00My4yMjggNzcuNDI1bC0xOC4zLTYwLjk5Nkw2IDIzLjk5OXYyMGMwIDkuOTQyIDguMDU5IDE4IDE4IDE4djE2YzAgMS4xMDUuODk2IDIgMiAyaDE1LjMxMmMxLjM0IDAgMi4zLTEuMjkgMS45MTYtMi41NzQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02NCAtMzAyKSBtYXRyaXgoLTEgMCAwIDEgMzExIDMwMikgbWF0cml4KC0xIDAgMCAxIDQzLjUgMCkiLz4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBmaWxsPSIjRkZGIiBkPSJNMjQuMzQ5IDE0LjQ5NUw2IDIwIDYgMjQgMjQuOTI5IDE2LjQyOXoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02NCAtMzAyKSBtYXRyaXgoLTEgMCAwIDEgMzExIDMwMikgbWF0cml4KC0xIDAgMCAxIDQzLjUgMCkiLz4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBmaWxsPSIjMDAwIiBkPSJNMTMgNmMtLjU1MiAwLTEgLjQ0OC0xIDFzLjQ0OCAxIDEgMSAxLS40NDggMS0xLS40NDgtMS0xLTEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02NCAtMzAyKSBtYXRyaXgoLTEgMCAwIDEgMzExIDMwMikgbWF0cml4KC0xIDAgMCAxIDQzLjUgMCkiLz4KICAgICAgICAgICAgICAgICAgICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNjQgLTMwMikgbWF0cml4KC0xIDAgMCAxIDMxMSAzMDIpIG1hdHJpeCgtMSAwIDAgMSA0My41IDApIHRyYW5zbGF0ZSgwIDgpIj4KICAgICAgICAgICAgICAgICAgICAgICAgPG1hc2sgaWQ9InFtZXN0NmY5Y2IiIGZpbGw9IiNmZmYiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPHVzZSB4bGluazpocmVmPSIjbTZtMDMyM3d3YSIvPgogICAgICAgICAgICAgICAgICAgICAgICA8L21hc2s+CiAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGZpbGw9IiNFNjRGMEEiIGQ9Ik0uNDAyIDQuMmMtLjc3LjU3Ni0uMzYxIDEuOC42IDEuOEg2Vi4wMDFMLjQwMiA0LjJ6IiBtYXNrPSJ1cmwoI3FtZXN0NmY5Y2IpIi8+CiAgICAgICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgICAgICAgIDxwYXRoIGZpbGw9IiNFNjRGMEEiIGQ9Ik0xMC4wMDIgMTJsLTQtNEw2IDguMDAyVjE0aDIuMDAyYzEuMTA0IDAgMi0uODk2IDItMiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTY0IC0zMDIpIG1hdHJpeCgtMSAwIDAgMSAzMTEgMzAyKSBtYXRyaXgoLTEgMCAwIDEgNDMuNSAwKSIvPgogICAgICAgICAgICAgICAgICAgIDxwYXRoIGZpbGw9IiM1NjU2NTYiIGQ9Ik0yNiAyMHMtOCA4LTggMjAgMjAgMjAgMjAgMjBMMjYgMjB6IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNjQgLTMwMikgbWF0cml4KC0xIDAgMCAxIDMxMSAzMDIpIG1hdHJpeCgtMSAwIDAgMSA0My41IDApIi8+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZmlsbD0iI0U2NEYwQSIgZD0iTTI0IDY4Yy0xLjEwNSAwLTItLjg5NS0yLTJ2LTRjMC0xLjEwNS44OTUtMiAyLTJzMiAuODk1IDIgMnY0YzAgMS4xMDUtLjg5NSAyLTIgMk0xOCA2OGMtMS4xMDUgMC0yLS44OTUtMi0ydi00YzAtMS4xMDUuODk1LTIgMi0yczIgLjg5NSAyIDJ2NGMwIDEuMTA1LS44OTUgMi0yIDIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02NCAtMzAyKSBtYXRyaXgoLTEgMCAwIDEgMzExIDMwMikgbWF0cml4KC0xIDAgMCAxIDQzLjUgMCkiLz4KICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgIDxnPgogICAgICAgICAgICAgICAgICAgIDxwYXRoIGZpbGw9IiMwMDk3QTciIGQ9Ik0yMS43MSA1LjcwMWMtMS4wMTUtMy4zODQtNC4xMy01LjctNy42NjItNS43SDE0QzkuNTgyIDAgNiAzLjU4IDYgOGguMDAybDQgNGMwIDEuMTA0LS44OTYgMi0yIDJINnY2bDE4LjM0OC01LjUwNi0yLjYzOC04Ljc5NHoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02NCAtMzAyKSBtYXRyaXgoLTEgMCAwIDEgMzExIDMwMikgdHJhbnNsYXRlKDE2MykiLz4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBmaWxsPSIjQThBOEE4IiBkPSJNNDMuMjI4IDc3LjQyNWwtMTguMy02MC45OTZMNiAyMy45OTl2MjBjMCA5Ljk0MiA4LjA1OSAxOCAxOCAxOHYxNmMwIDEuMTA1Ljg5NiAyIDIgMmgxNS4zMTJjMS4zNCAwIDIuMy0xLjI5IDEuOTE2LTIuNTc0IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNjQgLTMwMikgbWF0cml4KC0xIDAgMCAxIDMxMSAzMDIpIHRyYW5zbGF0ZSgxNjMpIi8+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZmlsbD0iI0ZGRiIgZD0iTTI0LjM0OSAxNC40OTVMNiAyMCA2IDI0IDI0LjkyOSAxNi40Mjl6IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNjQgLTMwMikgbWF0cml4KC0xIDAgMCAxIDMxMSAzMDIpIHRyYW5zbGF0ZSgxNjMpIi8+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZmlsbD0iIzAwMCIgZD0iTTEzIDZjLS41NTIgMC0xIC40NDgtMSAxcy40NDggMSAxIDEgMS0uNDQ4IDEtMS0uNDQ4LTEtMS0xIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNjQgLTMwMikgbWF0cml4KC0xIDAgMCAxIDMxMSAzMDIpIHRyYW5zbGF0ZSgxNjMpIi8+CiAgICAgICAgICAgICAgICAgICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTY0IC0zMDIpIG1hdHJpeCgtMSAwIDAgMSAzMTEgMzAyKSB0cmFuc2xhdGUoMTYzKSB0cmFuc2xhdGUoMCA4KSI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxtYXNrIGlkPSJqNmljNDZwdTNkIiBmaWxsPSIjZmZmIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3RheTJtc3lxbmMiLz4KICAgICAgICAgICAgICAgICAgICAgICAgPC9tYXNrPgogICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBmaWxsPSIjRTY0RjBBIiBkPSJNLjQwMiA0LjJjLS43Ny41NzYtLjM2MSAxLjguNiAxLjhINlYuMDAxTC40MDIgNC4yeiIgbWFzaz0idXJsKCNqNmljNDZwdTNkKSIvPgogICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBmaWxsPSIjRTY0RjBBIiBkPSJNMTAuMDAyIDEybC00LTRMNiA4LjAwMlYxNGgyLjAwMmMxLjEwNCAwIDItLjg5NiAyLTIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02NCAtMzAyKSBtYXRyaXgoLTEgMCAwIDEgMzExIDMwMikgdHJhbnNsYXRlKDE2MykiLz4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBmaWxsPSIjNTY1NjU2IiBkPSJNMjYgMjBzLTggOC04IDIwIDIwIDIwIDIwIDIwTDI2IDIweiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTY0IC0zMDIpIG1hdHJpeCgtMSAwIDAgMSAzMTEgMzAyKSB0cmFuc2xhdGUoMTYzKSIvPgogICAgICAgICAgICAgICAgICAgIDxwYXRoIGZpbGw9IiNFNjRGMEEiIGQ9Ik0yNCA2OGMtMS4xMDUgMC0yLS44OTUtMi0ydi00YzAtMS4xMDUuODk1LTIgMi0yczIgLjg5NSAyIDJ2NGMwIDEuMTA1LS44OTUgMi0yIDJNMTggNjhjLTEuMTA1IDAtMi0uODk1LTItMnYtNGMwLTEuMTA1Ljg5NS0yIDItMnMyIC44OTUgMiAydjRjMCAxLjEwNS0uODk1IDItMiAyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNjQgLTMwMikgbWF0cml4KC0xIDAgMCAxIDMxMSAzMDIpIHRyYW5zbGF0ZSgxNjMpIi8+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPgo=" alt=""/></div>
+    </div>
+    <div class="g-sub">
+      <h3 id="g-date"></h3>
+      <button class="g-zoom" id="g-zoom" aria-label="Zoom"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgdmlld0JveD0iMCAwIDIwIDIwIj4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZmlsbD0iIzU2NTY1NiIgZD0iTTE5LjQxNCAxNi41ODZsLTIuODAxLTIuODAxQTguOTQyIDguOTQyIDAgMCAwIDE4IDlhOSA5IDAgMCAwLTktOSA5IDkgMCAwIDAtOSA5IDkgOSAwIDAgMCA5IDkgOC45NDIgOC45NDIgMCAwIDAgNC43ODUtMS4zODdsMi44MDEgMi44MDFjLjM5LjM5MS45MDIuNTg2IDEuNDE0LjU4NmEyIDIgMCAwIDAgMS40MTQtMy40MTQiLz4KICAgICAgICA8cGF0aCBmaWxsPSIjRkZGIiBkPSJNMTMgOGgtM1Y1YTEgMSAwIDAgMC0yIDB2M0g1YTEgMSAwIDAgMCAwIDJoM3YzYTEgMSAwIDAgMCAyIDB2LTNoM2ExIDEgMCAwIDAgMC0yIi8+CiAgICA8L2c+Cjwvc3ZnPgo=" alt=""/></button>
+      <div class="tbg g-meas" id="g-meas"><button data-m="volume" class="sel">kWh</button><button data-m="costs">€</button></div>
+      <div class="g-unitdisk" id="g-unitdisk">W</div>
+    </div>
+    <div class="g-legend" id="g-legend"></div>
+  </div>
+</div>
+
+<div class="modal" id="g-dialog">
+  <div class="modal-card">
+    <button class="radio-row" data-res="electricity"><span class="radio"></span><span>Stroom</span></button>
+    <button class="radio-row" data-res="gas"><span class="radio"></span><span>Gas</span></button>
+    <button class="primary-btn" id="g-dialog-ok">OK</button>
+  </div>
+</div>
+
+<div class="page" id="page-program">
+  <div class="page-head"><button class="back-btn" data-close aria-label="Terug"><svg viewBox="0 0 20 20"><path fill="#FFF" fill-rule="evenodd" d="M4.25 10c0 .384.146.768.439 1.061l8.5 8.5a1.502 1.502 0 0 0 2.122 0 1.502 1.502 0 0 0 0-2.122L7.871 10l7.44-7.439a1.502 1.502 0 0 0 0-2.122 1.502 1.502 0 0 0-2.122 0l-8.5 8.5A1.495 1.495 0 0 0 4.25 10"/></svg></button><div class="page-title">Weekprogramma</div></div>
+  <div class="page-body s-body">
+    <div class="prg-page">
+      <div class="prg-top"><span class="prg-top-txt" id="prg-label">Programma aan</span><button class="switch" id="prg-toggle" aria-label="Programma aan/uit"><span class="knob"></span></button></div>
+      <div class="prg-body" id="prg-body"><div class="empty">Programma laden…</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-holiday">
+  <div class="page-head"><button class="back-btn" data-close aria-label="Terug"><svg viewBox="0 0 20 20"><path fill="#FFF" fill-rule="evenodd" d="M4.25 10c0 .384.146.768.439 1.061l8.5 8.5a1.502 1.502 0 0 0 2.122 0 1.502 1.502 0 0 0 0-2.122L7.871 10l7.44-7.439a1.502 1.502 0 0 0 0-2.122 1.502 1.502 0 0 0-2.122 0l-8.5 8.5A1.495 1.495 0 0 0 4.25 10"/></svg></button><div class="page-title">Vakantie</div></div>
+  <div class="page-body s-body"><div class="hol-wrap" id="hol-body"></div></div>
+</div>
+
+<div class="page" id="page-programedit">
+  <div class="page-head"><button class="back-btn" data-close aria-label="Terug"><svg viewBox="0 0 20 20"><path fill="#FFF" fill-rule="evenodd" d="M4.25 10c0 .384.146.768.439 1.061l8.5 8.5a1.502 1.502 0 0 0 2.122 0 1.502 1.502 0 0 0 0-2.122L7.871 10l7.44-7.439a1.502 1.502 0 0 0 0-2.122 1.502 1.502 0 0 0-2.122 0l-8.5 8.5A1.495 1.495 0 0 0 4.25 10"/></svg></button><div class="page-title">Weekprogramma</div></div>
+  <div class="page-body s-body"><div class="pe-wrap" id="pe-body"></div></div>
+  <div class="pe-barbtns"><button class="primary-btn ghost" id="pe-cancel">Annuleren</button><button class="primary-btn off" id="pe-save" disabled>Opslaan</button></div>
+</div>
+
+<div class="page" id="page-programcopy">
+  <div class="page-head"><button class="back-btn" data-close aria-label="Terug"><svg viewBox="0 0 20 20"><path fill="#FFF" fill-rule="evenodd" d="M4.25 10c0 .384.146.768.439 1.061l8.5 8.5a1.502 1.502 0 0 0 2.122 0 1.502 1.502 0 0 0 0-2.122L7.871 10l7.44-7.439a1.502 1.502 0 0 0 0-2.122 1.502 1.502 0 0 0-2.122 0l-8.5 8.5A1.495 1.495 0 0 0 4.25 10"/></svg></button><div class="page-title">Weekprogramma</div></div>
+  <div class="page-body s-body"><div class="pe-wrap" id="pc-body"></div></div>
+  <div class="pe-barbtns"><button class="primary-btn ghost" id="pc-cancel">Annuleren</button><button class="primary-btn off" id="pc-save" disabled>Opslaan</button></div>
+</div>
+
+<div class="modal" id="prg-modal"><div class="modal-card prg-modal-card" id="prg-modal-card"></div></div>
+<div class="prg-toast" id="prg-toast"></div>
+
+<div class="page" id="page-settings">
+  <div class="page-head"><button class="back-btn" data-close aria-label="Terug"><svg viewBox="0 0 20 20"><path fill="#FFF" fill-rule="evenodd" d="M4.25 10c0 .384.146.768.439 1.061l8.5 8.5a1.502 1.502 0 0 0 2.122 0 1.502 1.502 0 0 0 0-2.122L7.871 10l7.44-7.439a1.502 1.502 0 0 0 0-2.122 1.502 1.502 0 0 0-2.122 0l-8.5 8.5A1.495 1.495 0 0 0 4.25 10"/></svg></button><div class="page-title">Instellingen</div></div>
+  <div class="page-body s-body">
+      <div class="section-label">Weergave</div>
+      <div class="form-card">
+        <label>Thema
+          <select id="set-theme">
+            <option value="auto">Automatisch (volgt je telefoon)</option>
+            <option value="light">Licht</option>
+            <option value="dark">Donker</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="section-label native-only">Toon</div>
+      <div class="form-card native-only">
+        <label>Protocol
+          <select id="set-proto"><option value="http">http</option><option value="https">https</option></select>
+        </label>
+        <label>Adres (IP of hostnaam)
+          <input id="set-host" type="text" autocomplete="off" autocapitalize="off" placeholder="192.168.2.6"/>
+        </label>
+        <label>Poort (leeg = standaard)
+          <input id="set-port" type="text" inputmode="numeric" autocomplete="off" placeholder="80"/>
+        </label>
+        <label>Header-naam (alleen bij redirect-service)
+          <input id="set-hdrkey" type="text" autocomplete="off" autocapitalize="off" placeholder="Api-Key"/>
+        </label>
+        <label>Header-waarde / token (optioneel)
+          <input id="set-hdrval" type="text" autocomplete="off" autocapitalize="off"/>
+        </label>
+      </div>
+
+      <div class="section-label native-only">Cloudflare Access (toegang via tunnel)</div>
+      <div class="form-card native-only">
+        <div class="form-hint">Gebruik je Toon via een Cloudflare-tunnel? Kies hierboven https, vul je tunneladres in (zonder poort) en plak hier de service token.</div>
+        <label>Client ID
+          <input id="set-cfid" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="xxxxxxxx.access"/>
+        </label>
+        <label>Client Secret
+          <input id="set-cfsecret" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="plak hier het Client Secret"/>
+        </label>
+        <div class="form-hint">Het secret wordt versleuteld bewaard in de Android Keystore van je telefoon en staat nergens in de app-code.</div>
+        <button class="primary-btn ghost" id="cf-clear" type="button" style="display:none">Secret van deze telefoon wissen</button>
+      </div>
+
+      <div class="form-hint web-only" style="margin:14px 4px 0">Deze pagina draait op je Toon: de verbinding met thermostaat en P1-meter is automatisch. Inloggen bij Cloudflare regel je in de browser.</div>
+
+      <div class="section-label">Zonnepanelen</div>
+      <div class="form-card">
+        <label>Zonnepanelen tonen
+          <select id="set-solar">
+            <option value="auto">Automatisch (tonen als ze er zijn)</option>
+            <option value="ja">Altijd tonen</option>
+            <option value="nee">Nooit tonen</option>
+          </select>
+        </label>
+        <div class="form-hint" id="set-solarinfo"></div>
+      </div>
+
+      <div class="section-label">Gas</div>
+      <div class="form-card">
+        <label>Gas tonen
+          <select id="set-gas">
+            <option value="auto">Automatisch (tonen als er gas is)</option>
+            <option value="ja">Ja, ik heb gas</option>
+            <option value="nee">Nee, ik heb geen gas</option>
+          </select>
+        </label>
+        <div class="form-hint" id="set-gasinfo"></div>
+      </div>
+
+      <div class="section-label">Balken en vlakken (reserve)</div>
+      <div class="form-card">
+        <label>Stroom nu: vermogen (W) waarbij alle 10 streepjes branden
+          <input id="set-scalew" type="text" inputmode="numeric" placeholder="2500"/>
+        </label>
+        <label>Stroom vandaag: kWh waarbij beide vlakken vol zijn
+          <input id="set-scaledaycons" type="text" inputmode="numeric" placeholder="18"/>
+        </label>
+        <label>Gas vandaag: m³ waarbij beide vlakken vol zijn
+          <input id="set-scalegas" type="text" inputmode="decimal" placeholder="5"/>
+        </label>
+        <div class="form-hint">Wordt alleen gebruikt als de Toon geen gemiddelde verbruik doorgeeft; anders rekent de app zoals de originele Toon-app.</div>
+      </div>
+
+      <div class="section-label">Tarieven (voor de euro-weergave in de grafieken)</div>
+      <div class="form-card">
+        <label>Prijs verbruik (€ per kWh)
+          <input id="set-pricecons" type="text" inputmode="decimal" placeholder="bijv. 0,28"/>
+        </label>
+        <label>Vergoeding opwek / teruglevering (€ per kWh)
+          <input id="set-priceprod" type="text" inputmode="decimal" placeholder="bijv. 0,09"/>
+        </label>
+        <label>Prijs gas (€ per m³)
+          <input id="set-pricegas" type="text" inputmode="decimal" placeholder="bijv. 1,45"/>
+        </label>
+        <div class="form-hint">Leeg laten = de €-knop in de grafieken blijft uitgeschakeld.</div>
+      </div>
+
+      <div class="section-label">Grafieken</div>
+      <div class="form-card">
+        <label>Dag-verschuiving (0 = standaard)
+          <input id="set-dayshift" type="text" inputmode="numeric" placeholder="0"/>
+        </label>
+        <div class="form-hint">Staat een dagstaaf op de verkeerde dag, zet dit dan op 1 of -1.</div>
+      </div>
+
+      <button class="primary-btn" id="set-save">Opslaan &amp; testen</button>
+      <div class="form-status" id="set-status"></div>
+      
+    
+  </div>
+</div>
+
+<div class="page" id="page-about">
+  <div class="page-head"><button class="back-btn" data-close aria-label="Terug"><svg viewBox="0 0 20 20"><path fill="#FFF" fill-rule="evenodd" d="M4.25 10c0 .384.146.768.439 1.061l8.5 8.5a1.502 1.502 0 0 0 2.122 0 1.502 1.502 0 0 0 0-2.122L7.871 10l7.44-7.439a1.502 1.502 0 0 0 0-2.122 1.502 1.502 0 0 0-2.122 0l-8.5 8.5A1.495 1.495 0 0 0 4.25 10"/></svg></button><div class="page-title">Over deze app</div></div>
+  <div class="page-body s-body">
+    <div class="form-card about-card">
+      <div class="about-title">Toon <span id="about-ver">1.5.0</span></div>
+      <p>Opmaak en gedrag volgen de officiële Toon-app. Alle gegevens komen rechtstreeks uit je Toon; Home Assistant is niet nodig.</p>
+      <p><b>Thermostaat</b>: lokale Toon-koppeling.<br/><b>Energie nu en vandaag</b>: P1-meter en zonnemeter via de Toon (GetCurrentUsage).<br/><b>Grafieken</b>: de tellers en 5-minutenwaarden van de Toon (hcb_rrd).<br/><b>Aan · Uit</b>: slimme stekkers van de Toon.<br/>Zonnepanelen en gas worden alleen getoond als de Toon ze meet (of als je ze zelf aanvinkt).</p>
+    </div>
+  </div>
+</div>
+
+<script src="app.js?v=2.0.0"></script>
+<script src="p1.js?v=2.0.0"></script>
+<script src="graphs.js?v=2.0.0"></script>
+<script src="program.js?v=2.0.0"></script>
+<script src="thermo.js?v=2.0.0"></script>
+</body>
+</html>

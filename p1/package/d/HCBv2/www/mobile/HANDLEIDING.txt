@@ -1,0 +1,24 @@
+Toon - handleiding
+
+Installeren:   opkg install tsctoonmobilep1_1_1_0-r0_all.ipk
+Openen:        http://<toon-ipadres>/mobile/   (of je tunneladres met /mobile/)
+Verwijderen:   opkg remove tsctoonmobilep1
+
+Wat het doet
+- Alle waarden komen rechtstreeks van je Toon: thermostaat, P1-meter (verbruik nu en vandaag),
+  zonnepanelen en gas (alleen getoond als je Toon ze meet), grafieken en slimme stekkers.
+  Home Assistant is niet nodig en er wordt niets aan de webserver van de Toon gewijzigd.
+- Meer > Instellingen: zonnepanelen en gas staan op Automatisch; je kunt ze ook zelf aan of uit zetten.
+  Vul tarieven in om de euro-weergave in de grafieken te gebruiken.
+- Status > Gegevenscontrole laat per bron zien wat je Toon teruggeeft, handig als een getal niet klopt.
+- Meer > Instellingen > Weergave: Automatisch (volgt je telefoon), Licht of Donker.
+- Op je telefoon kun je de pagina toevoegen aan je beginscherm (menu van de browser).
+- Staat een dagstaaf op de verkeerde dag? Zet Instellingen > Grafieken > Dag-verschuiving op 1 of -1.
+
+Naast de Home Assistant-versie (/mobile/) te gebruiken; ze storen elkaar niet.
+
+Weekprogramma en vakantiestand
+------------------------------
+Meer > Programma toont en wijzigt het weekschema, Meer > Vakantie zet de vakantiestand aan of uit. De app schrijft
+rechtstreeks naar de Toon en controleert dat de thermostaat het overneemt. Voor elke wijziging bewaart de app het vorige
+programma in de telefoon; "Vorig programma terugzetten" onderaan het scherm zet het terug.

@@ -1,0 +1,82 @@
+#! /bin/sh
+
+SUBJECT="Toon 2.0"
+SUBTITLE="Toon is bijgewerkt."
+MESSAGE="Open http://<toon-ipadres>/mobile/ in je browser. Alle waarden komen rechtstreeks van je Toon (P1-meter, zonnepanelen en gas worden automatisch herkend). Instellingen en een donkere modus vind je onder Meer."
+
+dropboxMessage()
+{
+    time=`date +%s`
+    Message="
+	<Config>
+	<message>
+	 <content>$3</content>
+	  <subject>$1</subject>
+	  <subtitle>$2</subtitle>
+	  <messageType>critical</messageType>
+	  <received_t>$time</received_t>
+	  <internalAddress>dropboxed_$time</internalAddress>
+	  <read_t></read_t>
+	  <readMsgSend>1</readMsgSend>
+	  <hideOnRemove>0</hideOnRemove>
+	  <package>happ_usermsg</package>
+	  <type>message</type>
+	  <n>upgrade_msg</n>
+	  <visibility>1</visibility>
+	 </message>
+	</Config>"
+    echo "$Message" > /tmp/dropbox_msg.xml
+    mv /tmp/dropbox_msg.xml /HCBv2/config/dropbox/
+}
+
+(
+echo "Executing post-install script for tsctoonmobilep1 2.0.0 ..."
+if [ -d /HCBv2/config/dropbox ] ; then
+	dropboxMessage "$SUBJECT" "$SUBTITLE" "$MESSAGE"
+fi
+# Inlog voor /mobile: zelfde gebruiker en wachtwoord als de Toon (/qmf/etc/lighttpd/lighttpd.user)
+LCONF=/HCBv2/etc/lighttpd/lighttpd.conf
+LBAK=/HCBv2/etc/lighttpd/lighttpd.conf.tsctoonmobilep1_backup
+if [ -f "$LCONF" ] && [ -f /qmf/etc/lighttpd/lighttpd.user ] ; then
+	if grep -q '^auth.require.*"/mobile"' "$LCONF" || grep -q 'tsctoonmobilep1-auth' "$LCONF" ; then
+		echo "inlog voor /mobile staat al aan"
+	else
+		cp "$LCONF" "$LBAK"
+		if grep -q '^auth.require' "$LCONF" ; then OP='+=' ; else OP='=' ; fi
+		{
+			echo ""
+			echo "# tsctoonmobilep1-auth: inlog voor /mobile"
+			echo 'auth.backend = "plain"'
+			echo 'auth.backend.plain.userfile = "/qmf/etc/lighttpd/lighttpd.user"'
+			echo "auth.require $OP ( \"/mobile\" => ( \"method\" => \"basic\", \"realm\" => \"Enter password\", \"require\" => \"valid-user\" ) )"
+		} >> "$LCONF"
+		killall lighttpd 2>/dev/null
+		i=0 ; up=0
+		while [ $i -lt 10 ] ; do
+			sleep 2
+			if curl -sI -m 3 http://localhost/mobile/ 2>/dev/null | grep -q '^HTTP/' ; then up=1 ; break ; fi
+			i=$((i + 1))
+		done
+		if [ $up = 1 ] ; then
+			echo "inlog voor /mobile ingeschakeld"
+		else
+			echo "webserver reageert niet met de inlog: oorspronkelijke configuratie wordt teruggezet"
+			cp "$LBAK" "$LCONF" ; rm -f "$LBAK"
+			killall lighttpd 2>/dev/null
+		fi
+	fi
+fi
+sync
+echo "tsctoonmobilep1 2.0.0 post-install completed."
+)
+
+# Een eerder geïnstalleerde Programma-helper (alleen in oudere 2.0.0-testversies) opruimen: de app schrijft het
+# programma nu rechtstreeks naar de Toon en heeft geen helper meer nodig.
+if [ -f /etc/init.d/tsc-program-agent ] || [ -f /usr/bin/tsc-program-agent ] ; then
+	/etc/init.d/tsc-program-agent stop 2>/dev/null
+	[ -f /var/run/tsc-program-agent.pid ] && kill "$(cat /var/run/tsc-program-agent.pid)" 2>/dev/null
+	rm -f /etc/init.d/tsc-program-agent /etc/rc5.d/S99tscprogram /usr/bin/tsc-program-agent /var/run/tsc-program-agent.pid
+	rm -rf /usr/share/tsc-program
+	curl -s -m 5 -G --data-urlencode 'config=<Config><device><uuid>416bb789-387d-4087-bcf3-dac644bdc3c0</uuid><package>hcb_config</package><type>mailbox</type><internalAddress>tscmailbox</internalAddress><visibility>0</visibility><request></request><status></status><agent></agent></device></Config>' 'http://localhost/hcb_config?action=setObjectConfig' >/dev/null 2>&1
+fi
+exit 0

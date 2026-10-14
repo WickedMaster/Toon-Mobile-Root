@@ -1,0 +1,14 @@
+Onderdelen van derden
+
+Lettertypen: Open Sans (Light, Regular, SemiBold) in assets/www/fonts, van Steve Matteson
+(Ascender Corp.). Open Sans valt, afhankelijk van de versie, onder de Apache License 2.0 of de
+SIL Open Font License 1.1. Controleer bij verspreiding welke licentie bij het gebruikte
+bestand hoort en voeg die tekst toe.
+
+Pictogrammen: de bestanden in assets/www/img (icon-*.svg, pigeons-on-a-string.svg) zijn
+overgenomen uit de officiele Toon-app en zijn mogelijk eigendom van Eneco/Quby. Ze vallen
+NIET onder de MIT-licentie van dit project. Vervang ze door eigen pictogrammen voordat deze
+repository publiek wordt gemaakt of de APK aan anderen wordt gegeven.
+
+Merken: "Toon" is een merk van Eneco. Dit project is niet verbonden aan, goedgekeurd door
+of gesponsord door Eneco, Quby of Toon.

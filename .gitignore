@@ -1,0 +1,11 @@
+# De signeerssleutel hoort NOOIT in git (zonder deze sleutel kan er geen update meer worden gemaakt)
+*.keystore
+*.jks
+# build-uitvoer
+out/
+classes.dex
+*.unsigned.apk
+*.aligned.apk
+*.idsig
+__pycache__/
+.build/
